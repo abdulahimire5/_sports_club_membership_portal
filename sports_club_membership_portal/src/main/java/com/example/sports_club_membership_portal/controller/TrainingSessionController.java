@@ -1,6 +1,7 @@
 package com.example.sports_club_membership_portal.controller;
 import com.example.sports_club_membership_portal.dto.TrainingSessionRequestDTO;
 import com.example.sports_club_membership_portal.dto.TrainingSessionResponseDTO;
+import com.example.sports_club_membership_portal.service.TrainingSessionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
