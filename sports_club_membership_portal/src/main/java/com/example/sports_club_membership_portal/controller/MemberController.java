@@ -22,6 +22,10 @@ public class MemberController {
     public Member getOne(@PathVariable Integer id) {
         return memberService.getMemberById(id);
     }
+     @PostMapping
+    public Member create(@Valid @RequestBody Member member) {
+        return memberService.createMember(member);
+    }
    
     @PutMapping("/{id}")
     public Member update(@PathVariable Integer id, @RequestBody Member member) {
