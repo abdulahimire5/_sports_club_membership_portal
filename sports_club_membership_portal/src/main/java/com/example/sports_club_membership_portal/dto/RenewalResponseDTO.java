@@ -87,5 +87,5 @@ public class RenewalResponseDTO {
         }
 
         public void setPaymentStatus(String paymentStatus) {
-            this.paymentStatus = getPaymentStatus();
+            this.paymentStatus = paymentStatus;
         }}

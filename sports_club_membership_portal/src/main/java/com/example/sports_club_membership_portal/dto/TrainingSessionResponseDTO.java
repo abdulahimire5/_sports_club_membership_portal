@@ -38,7 +38,17 @@ public class TrainingSessionResponseDTO {
         }
 
     public static TrainingSessionResponseDTO fromEntity(trainingsession savedTrainingSession) {
-                return null;
+                if (savedTrainingSession == null) return null;
+                return new TrainingSessionResponseDTO(
+                        savedTrainingSession.getId(),
+                        savedTrainingSession.getSessionName(),
+                        savedTrainingSession.getTrainerName(),
+                        savedTrainingSession.getTrainingDate(),
+                        savedTrainingSession.getStartTime(),
+                        savedTrainingSession.getEndTime(),
+                        savedTrainingSession.getLocation(),
+                        savedTrainingSession.getTrainingType(),
+                        savedTrainingSession.getDescription());
     }
 
     public Long getId() {

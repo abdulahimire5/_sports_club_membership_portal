@@ -41,7 +41,16 @@ public class TrainingSessionRequestDTO {
         private String description;
 
         public trainingsession toEntity() {
-                return null;
+                trainingsession session = new trainingsession();
+                session.setSessionName(sessionName);
+                session.setTrainerName(trainerName);
+                session.setTrainingDate(trainingDate);
+                session.setStartTime(startTime);
+                session.setEndTime(endTime);
+                session.setLocation(location);
+                session.setTrainingType(trainingType);
+                session.setDescription(description);
+                return session;
         }
 }
 

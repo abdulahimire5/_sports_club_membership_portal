@@ -4,6 +4,7 @@ import com.example.sports_club_membership_portal.entity.Member;
 import com.example.sports_club_membership_portal.exception.ResourceNotFoundException;
 import com.example.sports_club_membership_portal.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -14,6 +15,9 @@ public class MemberService {
 
     @Autowired
     private MemberRepository memberRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public List<Member> getAllMembers() {
         return memberRepository.findAll();
@@ -28,7 +32,8 @@ public class MemberService {
         member.setJoinDate(LocalDate.now());
         member.setStatus("ACTIVE");
 
-        // Save password as it is (NOT encrypted)
+        // Store passwords securely while preserving the existing request format.
+        member.setPasswordHash(passwordEncoder.encode(member.getPasswordHash()));
         return memberRepository.save(member);
     }
 
