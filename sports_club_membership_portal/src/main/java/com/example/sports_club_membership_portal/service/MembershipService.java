@@ -2,6 +2,7 @@ package com.example.sports_club_membership_portal.service;
 
 import com.example.sports_club_membership_portal.dto.MemberShipRequestDTO;
 import com.example.sports_club_membership_portal.dto.MemberShipResponseDTO;
+import com.example.sports_club_membership_portal.dto.MembershipValidityResponseDTO;
 import com.example.sports_club_membership_portal.entity.Member;
 import com.example.sports_club_membership_portal.entity.MemberShip;
 import com.example.sports_club_membership_portal.entity.SubscriptionPlan;
@@ -14,6 +15,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -43,6 +46,43 @@ public class MembershipService {
                     .map(MemberShipResponseDTO::fromEntity)
                     .orElseThrow(() ->
                             new ResourceNotFoundException("Membership not found with ID: " + id));
+        }
+
+        /**
+         * Membership validity is determined from the existing Memberships table.
+         * A member can book only when their latest ACTIVE membership has started
+         * and its end date has not passed.
+         */
+        public MembershipValidityResponseDTO getMembershipValidity(Integer memberId) {
+            memberRepository.findById(memberId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Member not found with ID: " + memberId));
+
+            return membershipRepository
+                    .findFirstByMemberMemberIdAndStatusIgnoreCaseOrderByEndDateDesc(memberId, "ACTIVE")
+                    .map(membership -> toValidityResponse(memberId, membership))
+                    .orElse(new MembershipValidityResponseDTO(memberId, null, null, null,
+                            "EXPIRED", 0, false, true));
+        }
+
+        private MembershipValidityResponseDTO toValidityResponse(Integer memberId, MemberShip membership) {
+            LocalDate today = LocalDate.now();
+            LocalDate startDate = membership.getStartDate();
+            LocalDate endDate = membership.getEndDate();
+            boolean hasStarted = startDate != null && !today.isBefore(startDate);
+            boolean hasNotExpired = endDate != null && !today.isAfter(endDate);
+            boolean canBook = hasStarted && hasNotExpired;
+            long daysRemaining = canBook ? Math.max(0, ChronoUnit.DAYS.between(today, endDate)) : 0;
+
+            return new MembershipValidityResponseDTO(
+                    memberId,
+                    membership.getMembershipID(),
+                    startDate,
+                    endDate,
+                    canBook ? "ACTIVE" : "EXPIRED",
+                    daysRemaining,
+                    canBook,
+                    !canBook
+            );
         }
 
         // Create Membership

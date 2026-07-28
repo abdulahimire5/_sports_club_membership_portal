@@ -2,6 +2,7 @@ package com.example.sports_club_membership_portal.controller;
 
 import com.example.sports_club_membership_portal.dto.MemberShipRequestDTO;
 import com.example.sports_club_membership_portal.dto.MemberShipResponseDTO;
+import com.example.sports_club_membership_portal.dto.MembershipValidityResponseDTO;
 import com.example.sports_club_membership_portal.service.MembershipService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,11 @@ public class MemberShipController {
     @GetMapping("/{id}")
     public MemberShipResponseDTO getOne(@PathVariable Integer id) {
         return membershipService.getMembershipById(id);
+    }
+
+    @GetMapping("/member/{memberId}/validity")
+    public MembershipValidityResponseDTO getValidity(@PathVariable Integer memberId) {
+        return membershipService.getMembershipValidity(memberId);
     }
 
     @PostMapping

@@ -11,6 +11,8 @@ import com.example.sports_club_membership_portal.repository.MemberRepository;
 import com.example.sports_club_membership_portal.repository.TrainingSessionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,6 +23,7 @@ public class AttendanceService {
     private final AttendanceRepository attendanceRepository;
     private final MemberRepository memberRepository;
     private final TrainingSessionRepository trainingSessionRepository;
+    private final MembershipService membershipService;
 
     public List<AttendanceResponseDTO> getAll() {
         return attendanceRepository.findAll().stream().map(AttendanceResponseDTO::fromEntity).toList();
@@ -31,6 +34,10 @@ public class AttendanceService {
     }
 
     public AttendanceResponseDTO create(AttendanceRequestDTO request) {
+        if (!membershipService.getMembershipValidity(request.getMemberId()).isCanBook()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Membership is inactive or expired. Please renew before booking a training session.");
+        }
         if (attendanceRepository.existsByMemberMemberIdAndTrainingSessionId(request.getMemberId(), request.getTrainingSessionId())) {
             throw new IllegalArgumentException("This member already has a booking for the training session");
         }
